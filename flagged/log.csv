@@ -1,0 +1,4 @@
+pc_file,output,flag,username,timestamp
+/home/hoang/Projects/Pointnet_Pointnet2_pytorch/flagged/pc_file/434fe39e12b6acfc04e36dd01c479a427eb7cfda/modelnet40_train.txt,/home/hoang/Projects/Pointnet_Pointnet2_pytorch/flagged/output/tmp1m4l1vo0.json,,,2023-09-20 14:26:21.497045
+/home/hoang/Projects/Pointnet_Pointnet2_pytorch/flagged/pc_file/0ff02903135c148293961cf65e97a99c2dde9eda/modelnet40_train.txt,/home/hoang/Projects/Pointnet_Pointnet2_pytorch/flagged/output/tmpow3c6xza.json,,,2023-09-20 14:26:24.994315
+/home/hoang/Projects/Pointnet_Pointnet2_pytorch/flagged/pc_file/2b8bce3b16e16c36f22437c972fab0c983da5577/modelnet40_train.txt,/home/hoang/Projects/Pointnet_Pointnet2_pytorch/flagged/output/tmpilp94wdb.json,,,2023-09-20 14:26:29.793423

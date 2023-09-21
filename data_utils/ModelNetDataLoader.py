@@ -124,7 +124,9 @@ class ModelNetDataLoader(Dataset):
             if self.uniform:
                 point_set = farthest_point_sample(point_set, self.npoints)
             else:
+                # np.random.shuffle(point_set)
                 point_set = point_set[0:self.npoints, :]
+                # point_set = point_set[0:self.npoints]
                 
         point_set[:, 0:3] = pc_normalize(point_set[:, 0:3])
         if not self.use_normals:
