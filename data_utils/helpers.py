@@ -26,9 +26,22 @@ def stl_to_xyz_with_normals_vectorized(input_stl_file, output_xyz_file, sep=',',
     np.savetxt(output_xyz_file, vertices_with_normals, delimiter=sep, fmt='%.8f')
 
 
-
-def visualize_pointcloud(points_file, stride=1):
+def read_point_cloud_text(points_file, stride=1):
     points = np.loadtxt(points_file, delimiter=',')[::stride, :3].copy()
+    return points
+
+def visualize_pointcloud(points_file, stride=1, flip_axis=-1, postprocess_fn=None):
+    points = np.loadtxt(points_file, delimiter=',')[::stride, :3].copy()
+    visualize_pointcloud_np(points, flip_axis, postprocess_fn)
+
+
+def visualize_pointcloud_np(points, flip_axis=-1, postprocess_fn=None):
     pcd = o3.geometry.PointCloud()
+    # transformation
+    if flip_axis > -1:
+        points[:,flip_axis] = -points[:,flip_axis]
+    if postprocess_fn:
+        points = postprocess_fn(points)
+    # visualize
     pcd.points = o3.utility.Vector3dVector(points)
     o3.visualization.draw_plotly([pcd])
