@@ -173,7 +173,7 @@ class PointNetSetAbstraction(nn.Module):
             last_channel = out_channel
         self.group_all = group_all
 
-    def forward(self, xyz, points):
+    def forward(self, xyz, points, return_idxs=False):
         """
         Input:
             xyz: input points position data, [B, C, N]
@@ -197,8 +197,10 @@ class PointNetSetAbstraction(nn.Module):
             bn = self.mlp_bns[i]
             new_points =  F.relu(bn(conv(new_points)))
 
-        new_points = torch.max(new_points, 2)[0]
+        new_points, crit_idxs = torch.max(new_points, 2)
         new_xyz = new_xyz.permute(0, 2, 1)
+        if return_idxs:
+            return new_xyz, new_points, crit_idxs 
         return new_xyz, new_points
 
 

@@ -19,7 +19,7 @@ class get_model(nn.Module):
         self.drop2 = nn.Dropout(0.4)
         self.fc3 = nn.Linear(256, num_class)
 
-    def forward(self, xyz):
+    def forward(self, xyz, return_idxs=False):
         B, _, _ = xyz.shape
         if self.normal_channel:
             norm = xyz[:, 3:, :]
@@ -28,15 +28,20 @@ class get_model(nn.Module):
             norm = None
         l1_xyz, l1_points = self.sa1(xyz, norm)
         l2_xyz, l2_points = self.sa2(l1_xyz, l1_points)
-        l3_xyz, l3_points = self.sa3(l2_xyz, l2_points)
+        if return_idxs:
+            l3_xyz, l3_points, crit_idxs = self.sa3(l2_xyz, l2_points, True)
+        else:
+            l3_xyz, l3_points = self.sa3(l2_xyz, l2_points, False)
         x = l3_points.view(B, 1024)
         x = self.drop1(F.relu(self.bn1(self.fc1(x))))
         x = self.drop2(F.relu(self.bn2(self.fc2(x))))
         x = self.fc3(x)
         x = F.log_softmax(x, -1)
 
-
-        return x, l3_points
+        if return_idxs:
+            return x, l3_points, crit_idxs
+        else:
+            return x, l3_points
 
 
 
