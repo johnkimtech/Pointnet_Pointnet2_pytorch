@@ -14,11 +14,13 @@ from torch.utils.data import Dataset
 warnings.filterwarnings('ignore')
 
 
-def pc_normalize(pc):
+def pc_normalize(pc, return_scale=False):
     centroid = np.mean(pc, axis=0)
     pc = pc - centroid
     m = np.max(np.sqrt(np.sum(pc**2, axis=1)))
     pc = pc / m
+    if return_scale:
+        return pc, m
     return pc
 
 

@@ -1,7 +1,7 @@
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from pointnet2_utils import PointNetSetAbstraction
-
 
 class get_model(nn.Module):
     def __init__(self,num_class,normal_channel=True):
@@ -19,7 +19,28 @@ class get_model(nn.Module):
         self.drop2 = nn.Dropout(0.4)
         self.fc3 = nn.Linear(256, num_class)
 
-    def forward(self, xyz, return_idxs=False):
+    def forward(self, xyz, encode_only=False):
+        B, _, _ = xyz.shape
+        if self.normal_channel:
+            norm = xyz[:, 3:, :]
+            xyz = xyz[:, :3, :]
+        else:
+            norm = None
+        l1_xyz, l1_points = self.sa1(xyz, norm)
+        l2_xyz, l2_points = self.sa2(l1_xyz, l1_points)
+        l3_xyz, l3_points = self.sa3(l2_xyz, l2_points, False)
+        x = l3_points.view(B, 1024)
+        if encode_only:
+            return x
+        x = self.drop1(F.relu(self.bn1(self.fc1(x))))
+        x = self.drop2(F.relu(self.bn2(self.fc2(x))))
+        x = self.fc3(x)
+        x = F.log_softmax(x, -1)
+        return x, l3_points
+
+
+    @torch.no_grad()
+    def predict(self, xyz, return_idxs=False):
         B, _, _ = xyz.shape
         if self.normal_channel:
             norm = xyz[:, 3:, :]
@@ -42,7 +63,6 @@ class get_model(nn.Module):
             return x, l3_points, crit_idxs
         else:
             return x, l3_points
-
 
 
 class get_loss(nn.Module):
