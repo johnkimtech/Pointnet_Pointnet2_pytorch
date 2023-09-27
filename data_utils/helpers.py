@@ -29,7 +29,7 @@ def stl_to_xyz_with_normals_vectorized(
     edges2 = points_C - points_A
     normals = np.cross(edges1, edges2)
     if flip_axis > -1:
-        normals =-normals
+        normals = -normals
     norm_mags = np.linalg.norm(normals, axis=1)
     eps = 1e-8
     normals /= norm_mags[:, np.newaxis] + eps

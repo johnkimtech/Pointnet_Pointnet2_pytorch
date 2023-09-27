@@ -9,11 +9,7 @@ sys.path.append("models")
 
 
 def get_backbone(
-    backbone_model_name,
-    num_class,
-    normal_channel,
-    backbone_pretrained_path=None,
-    cutoff: int = -1,
+    backbone_model_name, num_class, normal_channel, backbone_pretrained_path=None
 ):
     model_class = importlib.import_module(backbone_model_name)
     backbone_model = model_class.get_model(num_class, normal_channel)
@@ -32,7 +28,6 @@ class get_model(nn.Module):
         backbone_pretrained_path: str = None,
         backbone_frozen: bool = True,
         backbone_outdims: int = 256,
-        backbone_cutoff: int = -6,
         num_class: int = 42,
         normal_channel: bool = True,
         n_out_dims: int = 10,
@@ -43,7 +38,6 @@ class get_model(nn.Module):
             num_class,
             normal_channel,
             backbone_pretrained_path,
-            backbone_cutoff,
         )
         if backbone_frozen:
             self.backbone = self.backbone.eval()
@@ -59,7 +53,7 @@ class get_model(nn.Module):
         self.fc = nn.Sequential(nn.Linear(backbone_outdims, n_out_dims))
 
     def forward(self, xyz):
-        x = self.backbone(xyz, encode_only=True)
+        x = self.backbone(xyz.transpose(2, 1), encode_only=True)
         x = self.mlp(x)
         outs = self.fc(x)
         return outs
@@ -69,7 +63,7 @@ class get_loss(nn.Module):
     def __init__(self):
         super(get_loss, self).__init__()
 
-    def forward(self, pred, target, trans_feat):
+    def forward(self, pred, target):
         total_loss = F.mse_loss(pred, target)
 
         return total_loss
